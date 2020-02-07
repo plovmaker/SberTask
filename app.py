@@ -34,7 +34,7 @@ class RequestSchema(ma.Schema):
 
 # Init schema
 request_schema = RequestSchema()
-requests_schema = RequestSchema() 
+requests_schema = RequestSchema(many=True) 
 
 # Create a Request
 @app.route('/request', methods=['POST'])
@@ -50,8 +50,25 @@ def add_request():
     db.session.commit()
 
     
-    print(weather['main']['temp'])
+    
     return request_schema.jsonify(new_request)
+
+# Получить все запросы из базы данных 
+@app.route('/request', methods=['GET'])
+def get_requests():
+    all_requests = Request.query.all()
+    #print(all_requests)
+    result = requests_schema.dump(all_requests)
+    print(result)
+    return jsonify(result).data
+
+# Получить 1 запрос из базы данных 
+@app.route('/request/<id>', methods=['GET'])
+def get_request(id):
+    request = Request.query.get(id)
+    return request_schema.jsonify(request)
+
+
 
 #Run Server
 if __name__ == '__main__':
